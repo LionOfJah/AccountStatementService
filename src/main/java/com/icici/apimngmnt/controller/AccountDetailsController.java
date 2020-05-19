@@ -25,6 +25,8 @@ public class AccountDetailsController {
 	
 	@Autowired
 	RequestModel requestModel;
+
+	String response;
 	
 	@Autowired
 	AccountStatementConsolidateService consolidateService;
@@ -35,8 +37,15 @@ public class AccountDetailsController {
 
 		BufferedReader reader = new BufferedReader(new InputStreamReader(input));
 		
-		requestModel = consolidateService.acStatementConsolidate(reader,accountNo);
+		response = consolidateService.acStatementConsolidate(reader,accountNo);
 		
+		if(!response.isEmpty() || response!=null) {
+			requestModel.setStatus("success");
+			requestModel.setAcStatement(response);
+		}else {
+			requestModel.setStatus("fail");
+			requestModel.setAcStatement(response);
+		}
 		logger.info("Account No "+accountNo);
 		return ResponseEntity.ok().body(requestModel);
 	}

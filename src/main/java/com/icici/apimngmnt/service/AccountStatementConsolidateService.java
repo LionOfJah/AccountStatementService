@@ -9,5 +9,5 @@ import com.icici.apimngmnt.model.RequestModel;
 @Service
 public interface AccountStatementConsolidateService {
 
-	public RequestModel acStatementConsolidate(BufferedReader reader,String acNo);
+	public String acStatementConsolidate(BufferedReader reader,String acNo);
 }

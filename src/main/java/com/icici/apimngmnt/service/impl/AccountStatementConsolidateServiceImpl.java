@@ -15,13 +15,13 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 
 	Logger logger = LoggerFactory.getLogger(this.getClass());
 
-	@Autowired
-	RequestModel requestModel;
+	
+	String response;
 
 	@Override
-	public RequestModel acStatementConsolidate(BufferedReader reader, String acNo) {
+	public String acStatementConsolidate(BufferedReader reader, String acNo) {
 
-		requestModel = new RequestModel();
+		//requestModel = new RequestModel();
 
 		StringBuilder builder = new StringBuilder();
 		String maskedAcNo = acNo.substring(0, acNo.length() - 4);
@@ -45,14 +45,12 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 			
 			response = builder.substring(builder.indexOf(fixedString), builder.lastIndexOf("&#13"));
 			response = response.substring(response.indexOf(fixedString), response.indexOf(specialCharEnd));
-			requestModel.setAcStatement(response + specialCharEnd);
+			
 			logger.info(response);
 
-		}else {
-			requestModel.setAcStatement("No Statement Details Available For this Account Number");
 		}
 
-		return requestModel;
+		return response;
 
 	}
 
