@@ -44,7 +44,7 @@ public class AccountDetailsController {
 			requestModel.setAcStatement(response);
 		}else {
 			requestModel.setStatus("fail");
-			requestModel.setAcStatement(response);
+			requestModel.setAcStatement("No Data Found For this A/c No");
 		}
 		logger.info("Account No "+accountNo);
 		return ResponseEntity.ok().body(requestModel);
