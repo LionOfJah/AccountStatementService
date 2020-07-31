@@ -34,16 +34,21 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 				+ acNo.substring(acNo.length() - 4, acNo.length());
 		String fixedString1="Statement of Transactions in CurrentNumber: "+maskedAcNo+acNo.substring(acNo.length() - 4, acNo.length());
 
-		String elseCaseEndString = "Statement";
+		String elseCaseEndString = "EZQ";
 		String response = "";
 		//logger.info("fixedString "+fixedString);
 
 		reader.lines().forEach(line -> {
-			builder.append(line);
-			builder.append("\n");
+			if(line.isEmpty()) {
+				builder.append(line);
+				builder.append("EZQ\n");
+			}else {
+				builder.append(line);
+				builder.append("\n");
+			}
 		});
 
-		//logger.info("builder "+builder.toString());
+		logger.info("builder "+builder.toString());
 		//logger.info("builder.lastIndexOf(fixedString1) "+builder.lastIndexOf(fixedString1));
 		if (builder.indexOf(fixedString) != -1 || builder.lastIndexOf(fixedString1)!=-1) {
 			
@@ -54,8 +59,10 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 				response = response.substring(response.indexOf(fixedString), response.indexOf("\n"+specialCharSt));
 				
 			}else {
-				//logger.info("builder.indexOf(fixedString1) "+builder.indexOf(fixedString1));
+				logger.info("builder.indexOf(fixedString1) "+builder.indexOf(fixedString1));
+				logger.info("builder.indexOf(fixedString1) "+builder.lastIndexOf(elseCaseEndString));
 				response = builder.substring(builder.indexOf(fixedString1), builder.lastIndexOf(elseCaseEndString));
+				response = response.substring(response.indexOf(fixedString1), response.indexOf(elseCaseEndString));
 				
 			}
 			
