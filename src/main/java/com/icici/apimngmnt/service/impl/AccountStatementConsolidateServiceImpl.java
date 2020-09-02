@@ -1,6 +1,8 @@
-package com.icici.apimngmnt.service.impl;
+	package com.icici.apimngmnt.service.impl;
 
 import java.io.BufferedReader;
+import java.io.StringReader;
+import java.util.Arrays;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,28 +44,75 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 			if(line.isEmpty()) {
 				builder.append(line);
 				builder.append("EZQ\n");
+				
 			}else {
 				builder.append(line);
 				builder.append("\n");
+				//logger.info("Line Appended is "+line);
 			}
 		});
 
-		logger.info("builder "+builder.toString());
+		//logger.info("builder "+builder.toString());
 		//logger.info("builder.lastIndexOf(fixedString1) "+builder.lastIndexOf(fixedString1));
 		if (builder.indexOf(fixedString) != -1 || builder.lastIndexOf(fixedString1)!=-1) {
 			
-			//logger.info("Inside builder op" +builder);
+			
 			if(builder.lastIndexOf(specialCharSt)!=-1) {
 				
 				response = builder.substring(builder.indexOf(fixedString), builder.lastIndexOf(specialCharSt));
 				response = response.substring(response.indexOf(fixedString), response.indexOf("\n"+specialCharSt));
+				logger.info("Inside response builder op if" +response);
+				StringBuilder responseBuilder = new StringBuilder();
 				
+				StringReader stringReader = new StringReader(response);
+				BufferedReader buffStrReader = new BufferedReader(stringReader);
+				
+				buffStrReader.lines().forEach(line->{
+					
+					boolean flag=line.startsWith("Statement of");
+					if(!flag) {
+						String[] strArray=line.split("\\,");
+						if(strArray[0].equalsIgnoreCase("DATE")){
+							strArray[0]="transactionTimestamp";
+							String headerLine = "";
+							for (String string : strArray) {
+								headerLine=headerLine.concat(string+",");
+								
+							}
+							headerLine=headerLine.replaceAll("&#13;,", "");
+							headerLine = headerLine.concat(",CBSRFERECNCE,txnId");
+							responseBuilder.append(headerLine);
+							responseBuilder.append("\n");
+							logger.info("Respone Builder "+responseBuilder.toString());
+						}else {
+							strArray[0]=strArray[0].concat("T12:00:00-00:00");
+							if(strArray[1].equals(""))
+								strArray[1]="OTHERS";
+							String headerLine = "";
+							for (String string : strArray) {
+								headerLine=headerLine.concat(string+",");
+							}
+							headerLine=headerLine.replaceAll("&#13;,", "");
+							headerLine = headerLine.concat(", ,OTHERS");
+							responseBuilder.append(headerLine);
+							responseBuilder.append("\n");
+							logger.info("Respone Builder "+responseBuilder.toString());
+							
+						}
+								
+						
+					}else {
+						responseBuilder.append(line);
+					}
+				});
+				response = responseBuilder.toString();
+				logger.info("response "+response);
 			}else {
-				logger.info("builder.indexOf(fixedString1) "+builder.indexOf(fixedString1));
-				logger.info("builder.indexOf(fixedString1) "+builder.lastIndexOf(elseCaseEndString));
+				
+				
 				response = builder.substring(builder.indexOf(fixedString1), builder.lastIndexOf(elseCaseEndString));
 				response = response.substring(response.indexOf(fixedString1), response.indexOf(elseCaseEndString));
-				
+				logger.info("Inside response builder op else" +response);
 			}
 			
 			logger.info(response);
