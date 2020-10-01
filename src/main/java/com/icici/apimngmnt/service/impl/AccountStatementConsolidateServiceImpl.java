@@ -28,7 +28,6 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 		String maskedAcNo = acNo.substring(0, acNo.length() - 4);
 		maskedAcNo = maskedAcNo.replaceAll("\\d", "X");
 
-		// logger.info(maskedAcNo);
 		String specialCharSt = "&#13;";
 		// String specialCharEnd = ";&#13;";
 		String fixedString = "Statement of Transactions in SavingsNumber: " + maskedAcNo
@@ -52,16 +51,14 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 			}
 		});
 
-		// logger.info("builder "+builder.toString());
-		// logger.info("builder.lastIndexOf(fixedString1)
-		// "+builder.lastIndexOf(fixedString1));
-		if (builder.indexOf(fixedString) != -1 || builder.lastIndexOf(fixedString1) != -1) {
+		if (builder.indexOf(fixedString) != -1 || builder.indexOf(fixedString1) != -1) {
 
-			if (builder.lastIndexOf(specialCharSt) != -1) {
+			if (builder.indexOf(fixedString) != -1) {
 
+				 logger.info(builder.toString());
 				response = builder.substring(builder.indexOf(fixedString), builder.lastIndexOf(specialCharSt));
 				response = response.substring(response.indexOf(fixedString), response.indexOf("\n" + specialCharSt));
-				 logger.info("Inside response builder op if" +response);
+				logger.info("Inside response builder op if" + response);
 				StringBuilder responseBuilder = new StringBuilder();
 
 				StringReader stringReader = new StringReader(response);
@@ -109,9 +106,18 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 				logger.info("response " + response);
 			} else {
 
-				response = builder.substring(builder.indexOf(fixedString1), builder.lastIndexOf(elseCaseEndString));
-				response = response.substring(response.indexOf(fixedString1), response.indexOf(elseCaseEndString));
-				 logger.info("Inside response builder op else" +response);
+				if(builder.indexOf("EZQ")!=-1) {
+					response = builder.substring(builder.indexOf(fixedString1), builder.lastIndexOf(elseCaseEndString));
+					response = response.substring(response.indexOf(fixedString1), response.indexOf(elseCaseEndString));
+						
+				}else {
+					
+					response = builder.substring(builder.indexOf(fixedString1), builder.lastIndexOf(specialCharSt));
+					response = response.substring(response.indexOf(fixedString1), response.indexOf("\n"+specialCharSt));
+					
+				}
+				
+				logger.info("Inside response builder op else" + response);
 				StringBuilder responseBuilder = new StringBuilder();
 
 				StringReader stringReader = new StringReader(response);
@@ -121,6 +127,7 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 
 					boolean flag = line.startsWith("Statement of");
 					if (!flag) {
+						
 						String[] strArray = line.split("\\,");
 						if (strArray[0].equalsIgnoreCase("DATE")) {
 							strArray[0] = "transactionTimestamp";
@@ -133,9 +140,10 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 							headerLine = headerLine.concat(",CBSRFERECNCE,txnId");
 							responseBuilder.append(headerLine);
 							responseBuilder.append("\n");
-							//logger.info("Respone Builder " + responseBuilder.toString());
+							// logger.info("Respone Builder " + responseBuilder.toString());
 						} else {
 							strArray[0] = strArray[0].concat("T12:00:00-00:00");
+							
 							if (strArray[1].equals(""))
 								strArray[1] = "OTHERS";
 							String headerLine = "";
@@ -146,7 +154,7 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 							headerLine = headerLine.concat(", ,OTHERS");
 							responseBuilder.append(headerLine);
 							responseBuilder.append("\n");
-							//logger.info("Respone Builder " + responseBuilder.toString());
+							// logger.info("Respone Builder " + responseBuilder.toString());
 
 						}
 
