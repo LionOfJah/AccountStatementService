@@ -1,6 +1,7 @@
 package com.icici.apimngmnt.service.impl;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.StringReader;
 import java.util.Arrays;
 
@@ -39,11 +40,13 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 		String response = "";
 		// logger.info("fixedString "+fixedString);
 
+		
 		reader.lines().forEach(line -> {
 			if (line.isEmpty()) {
 				builder.append(line);
 				builder.append("EZQ\n");
 
+				
 			} else {
 				builder.append(line);
 				builder.append("\n");
@@ -51,11 +54,18 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 			}
 		});
 
+		logger.info("last index "+builder.indexOf("</XML>")+" builder capacity "+builder.capacity());
+		if(builder.capacity()-builder.indexOf("</XML>")>0) {
+		
+			builder.delete(builder.indexOf("</XML>"), builder.capacity());
+		}
+		
+		logger.info("builder "+builder.toString());
 		if (builder.indexOf(fixedString) != -1 || builder.indexOf(fixedString1) != -1) {
 
 			if (builder.indexOf(fixedString) != -1) {
 
-				 logger.info(builder.toString());
+				 //logger.info(builder.toString());
 				response = builder.substring(builder.indexOf(fixedString), builder.lastIndexOf(specialCharSt));
 				response = response.substring(response.indexOf(fixedString), response.indexOf("\n" + specialCharSt));
 				logger.info("Inside response builder op if" + response);
@@ -106,6 +116,7 @@ public class AccountStatementConsolidateServiceImpl implements AccountStatementC
 				logger.info("response " + response);
 			} else {
 
+				 //logger.info(builder.toString());
 				if(builder.indexOf("EZQ")!=-1) {
 					response = builder.substring(builder.indexOf(fixedString1), builder.lastIndexOf(elseCaseEndString));
 					response = response.substring(response.indexOf(fixedString1), response.indexOf(elseCaseEndString));
