@@ -1,0 +1,5 @@
+com\icici\apimngmnt\controller\AccountDetailsController.class
+com\icici\apimngmnt\service\impl\AccountStatementConsolidateServiceImpl.class
+com\icici\apimngmnt\model\RequestModel.class
+com\icici\apimngmnt\AcntStmtSrvApplication.class
+com\icici\apimngmnt\service\AccountStatementConsolidateService.class
