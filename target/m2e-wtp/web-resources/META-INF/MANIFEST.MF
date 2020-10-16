@@ -1,0 +1,7 @@
+Manifest-Version: 1.0
+Implementation-Title: AccountStatementService
+Implementation-Version: 2.2.7.RELEASE
+Build-Jdk-Spec: 1.8
+Created-By: Maven Integration for Eclipse
+Main-Class: com.icici.apimngmnt.AcntStmtSrvApplication
+
